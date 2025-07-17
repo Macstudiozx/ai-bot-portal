@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Army AI Bot Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px 0;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header h1 {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .search-filter {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            background: white;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .filter-btn.active {
+            background: #fff;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .bots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .bot-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .bot-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .bot-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            font-weight: bold;
+            overflow: hidden;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .bot-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .bot-avatar-text {
+            font-size: 2rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        .bot-name {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .bot-type {
+            color: #667eea;
+            font-weight: 500;
+            margin-bottom: 15px;
+            padding: 5px 15px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 15px;
+            display: inline-block;
+            font-size: 0.9rem;
+        }
+
+        .bot-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        .bot-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .action-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .chat-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .chat-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .guide-btn {
+            background: #f8f9fa;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .guide-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .stats {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-item {
+            color: white;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .no-results {
+            text-align: center;
+            color: white;
+            font-size: 1.2rem;
+            margin-top: 50px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #fff 0%, #f8f9ff 100%);
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease-out;
+            overflow: hidden;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .modal-bot-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            font-weight: bold;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            overflow: hidden;
+        }
+
+        .modal-bot-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .modal-bot-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .modal-bot-type {
+            font-size: 1rem;
+            opacity: 0.9;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 15px;
+            display: inline-block;
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        .modal-section {
+            margin-bottom: 25px;
+        }
+
+        .modal-section h3 {
+            color: #333;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-section p {
+            color: #666;
+            line-height: 1.6;
+            background: #f8f9ff;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .modal-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .feature-item {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .modal-footer {
+            padding: 20px 30px;
+            background: #f8f9ff;
+            text-align: center;
+            border-top: 1px solid #e0e6ff;
+        }
+
+        .modal-action-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            margin: 0 10px;
+        }
+
+        .modal-action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .bots-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-buttons {
+                justify-content: center;
+            }
+
+            .container {
+                padding: 20px 15px;
+            }
+
+            .bot-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🤖 Army AI Bot Portal</h1>
+        <p>เลือก AI Bot ที่เหมาะสมกับความต้องการของคุณ</p>
+    </div>
+
+    <div class="container">
+        <div class="stats">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number" id="totalBots">70</span>
+                    <span class="stat-label">AI Bots ทั้งหมด</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="activeCategories">0</span>
+                    <span class="stat-label">หมวดหมู่</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="visibleBots">70</span>
+                    <span class="stat-label">Bots ที่แสดง</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="search-filter">
+            <input type="text" class="search-box" id="searchBox" placeholder="🔍 ค้นหาชื่อ Bot หรือคำอธิบาย...">
+            <div class="filter-buttons" id="filterButtons">
+                <button class="filter-btn active" data-category="all">ทั้งหมด</button>
+            </div>
+        </div>
+
+        <div class="bots-grid" id="botsGrid">
+            <!-- Bots will be populated here -->
+        </div>
+
+        <div class="no-results" id="noResults" style="display: none;">
+            ไม่พบ Bot ที่ตรงกับการค้นหา
+        </div>
+    </div>
+
+    <!-- Modal for Bot Details -->
+    <div id="botModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="close" id="closeModal">&times;</span>
+                <div class="modal-bot-avatar" id="modalBotAvatar">A</div>
+                <div class="modal-bot-name" id="modalBotName">Bot Name</div>
+                <div class="modal-bot-type" id="modalBotType">Bot Type</div>
+            </div>
+            <div class="modal-body">
+                <div class="modal-section">
+                    <h3>📝 คำอธิบาย</h3>
+                    <p id="modalBotDescription">Bot description</p>
+                </div>
+                <div class="modal-section">
+                    <h3>🎯 ความสามารถหลัก</h3>
+                    <div class="modal-features" id="modalBotFeatures">
+                        <!-- Features will be populated here -->
+                    </div>
+                </div>
+                <div class="modal-section">
+                    <h3>💡 ตัวอย่างการใช้งาน</h3>
+                    <p id="modalBotExample">Usage example</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#" class="modal-action-btn" id="modalChatBtn" target="_blank">💬 เริ่มแชท</a>
+                <button class="modal-action-btn" onclick="closeModal()" style="background: #6c757d;">❌ ปิด</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Bot data
+        let botsData = [];
+        let currentFilter = 'all';
+
+        // All 70 bots data
+        function getAllBotsData() {
+            return [
+                // Original 40 bots
+                {"BOTNAME": "Ava", "Bot Type": "Social Media", "Picture": "1.Ava.png", "Description": "ให้คำแนะนำกลยุทธ์การเพิ่มผู้ติดตาม เช่น การวางแผนคอนเทนต์ การใช้ Hashtag และการทำ Collaboration", "GPT": "https://chatgpt.com/g/g-4QKGXg36k-ava-growth-gpt", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Stella", "Bot Type": "Social Media", "Picture": "2.Stella.png", "Description": "ช่วยวางแผนโพสต์ ตอบคอมเมนต์ และวางกลยุทธ์ Engagement", "GPT": "https://chatgpt.com/g/g-uEJfal4I1-stella-social-media-manager-gpt", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Leo", "Bot Type": "Social Media", "Picture": "3.Leo.png", "Description": "ช่วยวางสคริปต์พร้อมคำสำคัญที่ช่วยให้วิดีโอติดอันดับ", "GPT": "https://chatgpt.com/g/g-3SAiZW0Qs-leo-viral-scripts-gpt", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Ivy", "Bot Type": "Social Media", "Picture": "4.Ivy.png", "Description": "ช่วยวิเคราะห์ข้อมูลผู้ติดตาม พฤติกรรมการมีส่วนร่วม และแนะนำเวลาโพสต์ที่เหมาะสม", "GPT": "https://chatgpt.com/g/g-social-media-analytics", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Maya", "Bot Type": "Social Media", "Picture": "5.Maya.png", "Description": "ช่วยสร้าง Hashtag ที่มีประสิทธิภาพและแนะนำ Trending Topics", "GPT": "https://chatgpt.com/g/g-hashtag-expert", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Zoe", "Bot Type": "Social Media", "Picture": "6.Zoe.png", "Description": "ช่วยวางแผน Campaign และติดตามผลลัพธ์", "GPT": "https://chatgpt.com/g/g-campaign-planner", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Nova", "Bot Type": "Marketing", "Picture": "7.Nova.png", "Description": "ช่วยวิเคราะห์กลุ่มเป้าหมายและสร้างกลยุทธ์การตลาด", "GPT": "https://chatgpt.com/g/g-marketing-strategy", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Aria", "Bot Type": "Marketing", "Picture": "8.Aria.png", "Description": "ช่วยสร้างและปรับปรุง Sales Funnel", "GPT": "https://chatgpt.com/g/g-sales-funnel", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Luna", "Bot Type": "Marketing", "Picture": "9.Luna.png", "Description": "ช่วยวิเคราะห์คู่แข่งและหาโอกาสทางการตลาด", "GPT": "https://chatgpt.com/g/g-competitor-analysis", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Kai", "Bot Type": "Marketing", "Picture": "10.Kai.png", "Description": "ช่วยวางแผนงบประมาณการตลาดและการลงทุน ROI", "GPT": "https://chatgpt.com/g/g-marketing-budget", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Sage", "Bot Type": "Marketing", "Picture": "11.Sage.png", "Description": "ช่วยสร้าง Email Marketing Campaign ที่มีประสิทธิภาพ", "GPT": "https://chatgpt.com/g/g-email-marketing", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Rex", "Bot Type": "Marketing", "Picture": "12.Rex.png", "Description": "ช่วยวางกลยุทธ์ Influencer Marketing", "GPT": "https://chatgpt.com/g/g-influencer-marketing", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Jade", "Bot Type": "Content Creation", "Picture": "13.Jade.png", "Description": "ช่วยเขียนบทความและคอนเทนต์สำหรับบล็อก", "GPT": "https://chatgpt.com/g/g-blog-writer", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Echo", "Bot Type": "Content Creation", "Picture": "14.Echo.png", "Description": "ช่วยสร้างสคริปต์สำหรับวิดีโอและพอดแคสต์", "GPT": "https://chatgpt.com/g/g-script-writer", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Iris", "Bot Type": "Content Creation", "Picture": "15.Iris.png", "Description": "ช่วยสร้างเนื้อหาสำหรับการนำเสนอและ Pitch Deck", "GPT": "https://chatgpt.com/g/g-pitch-deck", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Orion", "Bot Type": "Content Creation", "Picture": "16.Orion.png", "Description": "ช่วยสร้าง Case Study และเนื้อหาทางเทคนิค", "GPT": "https://chatgpt.com/g/g-case-study", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Vale", "Bot Type": "Content Creation", "Picture": "17.Vale.png", "Description": "ช่วยสร้างเนื้อหาสำหรับ E-learning และการฝึกอบรม", "GPT": "https://chatgpt.com/g/g-elearning", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Pixel", "Bot Type": "Content Creation", "Picture": "18.Pixel.png", "Description": "ช่วยสร้างเนื้อหา Visual Content และ Infographic", "GPT": "https://chatgpt.com/g/g-visual-content", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Atlas", "Bot Type": "Business Intelligence", "Picture": "19.Atlas.png", "Description": "ช่วยวิเคราะห์ข้อมูลธุรกิจและสร้างรายงาน", "GPT": "https://chatgpt.com/g/g-business-analytics", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Cypher", "Bot Type": "Business Intelligence", "Picture": "20.Cypher.png", "Description": "ช่วยสร้างแดชบอร์ดและ Data Visualization", "GPT": "https://chatgpt.com/g/g-dashboard", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Vega", "Bot Type": "Business Intelligence", "Picture": "21.Vega.png", "Description": "ช่วยทำนายแนวโน้มและ Forecasting", "GPT": "https://chatgpt.com/g/g-forecasting", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Nexus", "Bot Type": "Business Intelligence", "Picture": "22.Nexus.png", "Description": "ช่วยวิเคราะห์ Customer Behavior และ Segmentation", "GPT": "https://chatgpt.com/g/g-customer-behavior", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Prism", "Bot Type": "Business Intelligence", "Picture": "23.Prism.png", "Description": "ช่วยวิเคราะห์ความเสี่ยงและโอกาสทางธุรกิจ", "GPT": "https://chatgpt.com/g/g-risk-analysis", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Quantum", "Bot Type": "Business Intelligence", "Picture": "24.Quantum.png", "Description": "ช่วยวิเคราะห์ Performance Metrics และ KPI Optimization", "GPT": "https://chatgpt.com/g/g-kpi-optimization", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Zara", "Bot Type": "Customer Service", "Picture": "25.Zara.png", "Description": "ช่วยตอบคำถามลูกค้าและแก้ไขปัญหาเบื้องต้น", "GPT": "https://chatgpt.com/g/g-customer-support", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Felix", "Bot Type": "Customer Service", "Picture": "26.Felix.png", "Description": "ช่วยจัดการคำร้องเรียนและ Escalation Process", "GPT": "https://chatgpt.com/g/g-complaint-management", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Ruby", "Bot Type": "Customer Service", "Picture": "27.Ruby.png", "Description": "ช่วยสร้าง Knowledge Base และ FAQ", "GPT": "https://chatgpt.com/g/g-knowledge-base", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Oscar", "Bot Type": "Customer Service", "Picture": "28.Oscar.png", "Description": "ช่วยวิเคราะห์ Customer Satisfaction และปรับปรุงบริการ", "GPT": "https://chatgpt.com/g/g-customer-satisfaction", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Mira", "Bot Type": "Customer Service", "Picture": "29.Mira.png", "Description": "ช่วยสร้าง Customer Journey Map และปรับปรุงประสบการณ์", "GPT": "https://chatgpt.com/g/g-customer-journey", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Dash", "Bot Type": "Customer Service", "Picture": "30.Dash.png", "Description": "ช่วยจัดการ Live Chat และ Real-time Support", "GPT": "https://chatgpt.com/g/g-live-chat", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Phoenix", "Bot Type": "Project Management", "Picture": "31.Phoenix.png", "Description": "ช่วยวางแผนโปรเจกต์และจัดการ Timeline", "GPT": "https://chatgpt.com/g/g-project-planning", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Storm", "Bot Type": "Project Management", "Picture": "32.Storm.png", "Description": "ช่วยจัดการทรัพยากรและการมอบหมายงาน", "GPT": "https://chatgpt.com/g/g-resource-management", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Blaze", "Bot Type": "Project Management", "Picture": "33.Blaze.png", "Description": "ช่วยติดตามความเสี่ยงและแก้ไขปัญหาโปรเจกต์", "GPT": "https://chatgpt.com/g/g-project-risk", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Titan", "Bot Type": "Project Management", "Picture": "34.Titan.png", "Description": "ช่วยสร้างรายงานความคืบหน้าและ Status Update", "GPT": "https://chatgpt.com/g/g-project-reporting", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Comet", "Bot Type": "Project Management", "Picture": "35.Comet.png", "Description": "ช่วยจัดการ Agile/Scrum และ Sprint Planning", "GPT": "https://chatgpt.com/g/g-agile-scrum", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Flux", "Bot Type": "Project Management", "Picture": "36.Flux.png", "Description": "ช่วยจัดการงบประมาณและ Cost Control", "GPT": "https://chatgpt.com/g/g-budget-control", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Axel", "Bot Type": "Sales", "Picture": "37.Axel.png", "Description": "ช่วยหา Lead และ Prospect ใหม่", "GPT": "https://chatgpt.com/g/g-lead-generation", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Raven", "Bot Type": "Sales", "Picture": "38.Raven.png", "Description": "ช่วยสร้าง Sales Pitch และการนำเสนอขาย", "GPT": "https://chatgpt.com/g/g-sales-pitch", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Jax", "Bot Type": "Sales", "Picture": "39.Jax.png", "Description": "ช่วยติดตาม Sales Pipeline และการปิดการขาย", "GPT": "https://chatgpt.com/g/g-sales-pipeline", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Bolt", "Bot Type": "Sales", "Picture": "40.Bolt.png", "Description": "ช่วยวิเคราะห์ Customer Objection และหาวิธีแก้ไข", "GPT": "https://chatgpt.com/g/g-objection-handling", "How to use it": "📚 How to use it"},
+                
+                // New 30 bots
+                {"BOTNAME": "Vinnie", "Bot Type": "Assistant", "Picture": "41.Vinnie.png", "Description": "เพื่อช่วยเหลือในการทำงานและตอบคำถามของผู้ใช้", "GPT": "https://chatgpt.com/g/g-JF3Pkx6Vc-vinnie-virtual-assistant-bot", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Cassie", "Bot Type": "Assistant", "Picture": "42.Cassie.png", "Description": "ช่วยในการแนะนำกระบวนการ onboarding สำหรับลูกค้าในธุรกิจ B2B", "GPT": "https://chatgpt.com/g/g-8UBBxVN9h-cassie-client-onboarding-bot", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Bobby", "Bot Type": "Assistant", "Picture": "43.Bobby.png", "Description": "เพื่อช่วยให้คำแนะนำและกลยุทธ์ที่ช่วยในการพัฒนาธุรกิจ", "GPT": "https://chatgpt.com/g/g-d2w7OYgeT-bobby-business-assistant-bot", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Ceevee", "Bot Type": "Business", "Picture": "44.Ceevee.png", "Description": "การช่วยแนะนำและปรับปรุง CV ให้มีความน่าสนใจ โดดเด่น และเหมาะสม", "GPT": "https://chatgpt.com/g/g-p3sonr3YA-ceevee-cv-enhancement-bot", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Emmi", "Bot Type": "Business", "Picture": "45.Emmi.png", "Description": "การให้คำแนะนำและสอนการใช้งาน Microsoft Excel", "GPT": "https://chatgpt.com/g/g-X1jC1nQfR-emmi-excel-mentor-bot", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Inti", "Bot Type": "Business", "Picture": "46.Inti.png", "Description": "การให้คำแนะนำและการฝึกซ้อมการสัมภาษณ์", "GPT": "https://chatgpt.com/g/g-00yAk3Z62-inti-interview-process-bot", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Cindy", "Bot Type": "Customer Support", "Picture": "47.Cindy.png", "Description": "การให้คำแนะนำเพื่อช่วยให้ให้บริการลูกค้าได้ดีขึ้น", "GPT": "https://chatgpt.com/g/g-4L3ATgyUH-cindy-customer-service-bot", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Victor", "Bot Type": "Customer Support", "Picture": "48.Victor.png", "Description": "ช่วยแนะนำผู้ใช้ในการตอบคำถามเกี่ยวกับผลิตภัณฑ์", "GPT": "https://chatgpt.com/g/g-rMsj13X7D-victor-virtual-support-bot", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Adam", "Bot Type": "Customer Support", "Picture": "49.Adam.png", "Description": "ช่วยปรับปรุงข้อความโฆษณาให้ชัดเจนและมีประสิทธิภาพ", "GPT": "https://chatgpt.com/g/g-EDvTwLa1n-adam-ad-optimisation-bot", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Barbara", "Bot Type": "Marketing", "Picture": "50.Barbara.png", "Description": "ช่วยให้ผู้เขียนสามารถสร้างบทความที่เหมาะสมกับการทำ SEO", "GPT": "https://chatgpt.com/g/g-WngocEgDe-barbara-blog-writing-bot", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Freddy", "Bot Type": "Marketing", "Picture": "51.Freddy.png", "Description": "การให้คำแนะนำและสอนวิธีใช้งาน Facebook Business Manager", "GPT": "https://chatgpt.com/g/g-2SHRS4nIX-freddy-facebook-business-manager-bot", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Gary", "Bot Type": "Marketing", "Picture": "52.Gary.png", "Description": "การให้คำแนะนำเกี่ยวกับการใช้งาน Google Ads", "GPT": "https://chatgpt.com/g/g-H8SJrJ3ol-gary-google-ads-bot", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Eddie", "Bot Type": "Content Creation", "Picture": "53.Eddie.png", "Description": "การช่วยสร้างและปรับปรุงเนื้อหาสำหรับอีเมลการตลาด", "GPT": "https://chatgpt.com/g/g-bQ2qRrpnW-eddie-email-marketing-bot", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Pea", "Bot Type": "Content Creation", "Picture": "54.Pea.png", "Description": "การช่วยสร้างเนื้อหาสำหรับการนำเสนอให้มีประสิทธิภาพ", "GPT": "https://chatgpt.com/g/g-x1SjCgGC6-pea-presentation-bot", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Wendy", "Bot Type": "Content Creation", "Picture": "55.Wendy.png", "Description": "การช่วยในการเขียนเนื้อหาสำหรับเว็บไซต์", "GPT": "https://chatgpt.com/g/g-A4OMU6wWN-wendy-website-content-bot", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Analisa", "Bot Type": "Data Analytics", "Picture": "56.Analisa.png", "Description": "การช่วยในการวิเคราะห์ข้อมูลโดยใช้เครื่องมือต่างๆ", "GPT": "https://chatgpt.com/g/g-GI2vF9nZL-analisa-data-analysis-bot", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Pia", "Bot Type": "Data Analytics", "Picture": "57.Pia.png", "Description": "การช่วยในการสร้างและปรับแต่ง Dashboard ใน Power BI", "GPT": "https://chatgpt.com/g/g-5rEyV1VBl-pia-power-bi-dashboard-bot", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Sheila", "Bot Type": "Data Analytics", "Picture": "58.Sheila.png", "Description": "การช่วยในการใช้งาน Google Sheets ในระดับสูง", "GPT": "https://chatgpt.com/g/g-rk7oSWKzT-sheila-google-sheets-bot", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Penny", "Bot Type": "Operations", "Picture": "59.Penny.png", "Description": "การช่วยในการวางแผนและจัดการโครงการให้มีประสิทธิภาพ", "GPT": "https://chatgpt.com/g/g-wI1jApJvr-penny-project-planning-bot", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Opie", "Bot Type": "Operations", "Picture": "60.Opie.png", "Description": "การช่วยปรับปรุงกระบวนการทำงานให้มีประสิทธิภาพมากขึ้น", "GPT": "https://chatgpt.com/g/g-Bk1yFp8aS-opie-optimization-bot", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Quinn", "Bot Type": "Operations", "Picture": "61.Quinn.png", "Description": "การช่วยในการควบคุมคุณภาพและการตรวจสอบมาตรฐาน", "GPT": "https://chatgpt.com/g/g-qArkkm3V3-quinn-quality-control-bot", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Robby", "Bot Type": "Operations", "Picture": "62.Robby.png", "Description": "การช่วยในการจัดการความเสี่ยงในธุรกิจ", "GPT": "https://chatgpt.com/g/g-ZHfOzG8Zg-robby-risk-management-bot", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Sallie", "Bot Type": "Sales", "Picture": "63.Sallie.png", "Description": "การช่วยในการสร้างและปรับปรุงกลยุทธ์การขาย", "GPT": "https://chatgpt.com/g/g-GKASmKFmY-sallie-sales-strategy-bot", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Sammy", "Bot Type": "Sales", "Picture": "64.Sammy.png", "Description": "การฝึกอบรมและพัฒนาทักษะการขาย", "GPT": "https://chatgpt.com/g/g-8OgaHfQ1c-sammy-sales-training-bot", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Terry", "Bot Type": "Technology", "Picture": "65.Terry.png", "Description": "การให้คำแนะนำด้านเทคโนโลยี", "GPT": "https://chatgpt.com/g/g-zVmgn0rZv-terry-technology-consulting-bot", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Techie", "Bot Type": "Technology", "Picture": "66.Techie.png", "Description": "การช่วยในการพัฒนาและดูแลเว็บไซต์", "GPT": "https://chatgpt.com/g/g-zY9GkfbPe-techie-website-development-bot", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Fiona", "Bot Type": "Finance", "Picture": "67.Fiona.png", "Description": "การให้คำปรึกษาด้านการเงิน", "GPT": "https://chatgpt.com/g/g-BzZJZu7c3-fiona-financial-advisory-bot", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Buddy", "Bot Type": "Finance", "Picture": "68.Buddy.png", "Description": "การช่วยในการจัดทำงบประมาณ", "GPT": "https://chatgpt.com/g/g-mFe3xJT9F-buddy-budget-planning-bot", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Holly", "Bot Type": "Human Resources", "Picture": "69.Holly.png", "Description": "การช่วยในการจัดการทรัพยากรบุคคล", "GPT": "https://chatgpt.com/g/g-8G0I7hCSe-holly-hr-management-bot", "How to use it": "📚 How to use it"},
+                {"BOTNAME": "Henry", "Bot Type": "Human Resources", "Picture": "70.Henry.png", "Description": "การช่วยในการฝึกอบรมและพัฒนาพนักงาน", "GPT": "https://chatgpt.com/g/g-vklNB2Hfa-henry-training-development-bot", "How to use it": "📚 How to use it"}
+            ];
+        }
+
+        // Function to get bot avatar (image or text)
+        function getBotAvatar(botName, pictureName) {
+            // Always show text avatar as default, no image loading
+            return `<span class="bot-avatar-text">${botName.charAt(0).toUpperCase()}</span>`;
+        }
+
+        // Function to get modal bot avatar
+        function getModalBotAvatar(botName, pictureName) {
+            // Always show text avatar as default
+            return botName.charAt(0).toUpperCase();
+        }
+
+        // Function to get bot features based on type
+        function getBotFeatures(botType) {
+            const featureMap = {
+                'Social Media': ['📊 วิเคราะห์ Engagement', '📝 สร้างเนื้อหา', '#️⃣ จัดการ Hashtag', '📅 วางแผนโพสต์'],
+                'Marketing': ['🎯 วิเคราะห์กลุ่มเป้าหมาย', '📈 วางกลยุทธ์', '💰 คำนวณ ROI', '📧 Email Marketing'],
+                'Content Creation': ['✍️ เขียนเนื้อหา', '🎥 สคริปต์วิดีโอ', '📊 Infographic', '📚 การศึกษา'],
+                'Business Intelligence': ['📊 วิเคราะห์ข้อมูล', '📈 สร้างรายงาน', '🔮 ทำนายแนวโน้ม', '📋 Dashboard'],
+                'Customer Service': ['💬 ตอบคำถาม', '🎧 แก้ไขปัญหา', '📞 จัดการ Escalation', '😊 Customer Experience'],
+                'Customer Support': ['💬 ตอบคำถาม', '🎧 แก้ไขปัญหา', '📞 จัดการ Escalation', '😊 Customer Experience'],
+                'Project Management': ['📅 วางแผนโปรเจกต์', '👥 จัดการทีม', '⏰ ติดตาม Timeline', '💰 ควบคุมงบประมาณ'],
+                'Sales': ['🎯 หา Lead', '💼 Sales Pitch', '📈 Pipeline', '🤝 ปิดการขาย'],
+                'Assistant': ['🤖 AI Assistant', '💡 คำแนะนำ', '🔧 ปรับแต่งได้', '⚡ ตอบสนองเร็ว'],
+                'Business': ['💼 ธุรกิจ', '📊 วิเคราะห์', '💡 คำแนะนำ', '🎯 เป้าหมาย'],
+                'Data Analytics': ['📊 วิเคราะห์ข้อมูล', '📈 สร้างรายงาน', '🔮 ทำนายแนวโน้ม', '📋 Dashboard'],
+                'Operations': ['⚙️ ปรับปรุงกระบวนการ', '📋 จัดการโครงการ', '🎯 ควบคุมคุณภาพ', '⚠️ จัดการความเสี่ยง'],
+                'Technology': ['💻 เทคโนโลยี', '🌐 เว็บไซต์', '🔧 แก้ไขปัญหา', '💡 คำแนะนำ'],
+                'Finance': ['💰 การเงิน', '📊 วิเคราะห์', '📋 งบประมาณ', '📈 วางแผน'],
+                'Human Resources': ['👥 ทรัพยากรบุคคล', '📚 ฝึกอบรม', '🎯 พัฒนา', '📋 จัดการ']
+            };
+            return featureMap[botType] || ['🤖 AI Assistant', '💡 คำแนะนำ', '🔧 ปรับแต่งได้', '⚡ ตอบสนองเร็ว'];
+        }
+
+        // Function to get usage example
+        function getUsageExample(botName, botType, description) {
+            const exampleMatch = description.match(/เช่น\s+(.+?)(?:\s|$)/);
+            if (exampleMatch) {
+                return exampleMatch[1];
+            }
+            
+            const examples = {
+                'Social Media': 'ช่วยวางแผน Content Calendar สำหรับ Instagram และ Facebook ของแบรนด์',
+                'Marketing': 'วิเคราะห์กลุ่มเป้าหมายและสร้างแผนการตลาดดิจิทัลสำหรับธุรกิจใหม่',
+                'Content Creation': 'สร้างเนื้อหาบทความ Blog และ Social Media Post ที่น่าสนใจ',
+                'Business Intelligence': 'วิเคราะห์ข้อมูลยอดขายและสร้าง Dashboard สำหรับผู้บริหาร',
+                'Customer Service': 'ตอบคำถามลูกค้าเกี่ยวกับสินค้าและบริการแบบ Real-time',
+                'Customer Support': 'ตอบคำถามลูกค้าเกี่ยวกับสินค้าและบริการแบบ Real-time',
+                'Project Management': 'วางแผนและติดตามความคืบหน้าของโปรเจกต์พัฒนาแอปพลิเคชัน',
+                'Sales': 'สร้าง Sales Pitch และติดตามลูกค้าในระบบ CRM',
+                'Assistant': 'ช่วยงานทั่วไปและตอบคำถามในการทำงานประจำวัน',
+                'Business': 'ให้คำแนะนำทางธุรกิจและการพัฒนาทักษะ',
+                'Data Analytics': 'วิเคราะห์ข้อมูลเพื่อหาแนวโน้มและสร้างรายงาน',
+                'Operations': 'ปรับปรุงกระบวนการทำงานและเพิ่มประสิทธิภาพ',
+                'Technology': 'แก้ไขปัญหาเทคนิคและให้คำแนะนำด้านเทคโนโลยี',
+                'Finance': 'วางแผนการเงินและจัดการงบประมาณ',
+                'Human Resources': 'จัดการทรัพยากรบุคคลและพัฒนาพนักงาน'
+            };
+            return examples[botType] || 'ช่วยงานต่างๆ ด้วย AI ที่ชาญฉลาด';
+        }
+
+        // Function to get chat URL (now uses real URLs from data)
+        function getChatUrl(botName, botGPTUrl) {
+            if (botGPTUrl && botGPTUrl.startsWith('http')) {
+                return botGPTUrl;
+            }
+            return `https://chatgpt.com/?bot=${encodeURIComponent(botName)}`;
+        }
+
+        // Function to render bots
+        function renderBots(bots) {
+            const botsGrid = document.getElementById('botsGrid');
+            const noResults = document.getElementById('noResults');
+            
+            if (bots.length === 0) {
+                botsGrid.style.display = 'none';
+                noResults.style.display = 'block';
+                return;
+            }
+
+            botsGrid.style.display = 'grid';
+            noResults.style.display = 'none';
+
+            botsGrid.innerHTML = bots.map((bot, index) => `
+                <div class="bot-card">
+                    <div class="bot-avatar">${getBotAvatar(bot.BOTNAME, bot.Picture)}</div>
+                    <div class="bot-name">${bot.BOTNAME}</div>
+                    <div class="bot-type">${bot['Bot Type']}</div>
+                    <div class="bot-description">${bot.Description}</div>
+                    <div class="bot-actions">
+                        <button class="action-btn chat-btn" data-bot-name="${bot.BOTNAME}" data-bot-url="${bot.GPT || ''}" data-action="chat">
+                            💬 Ask me
+                        </button>
+                        <button class="action-btn guide-btn" data-bot-name="${bot.BOTNAME}" data-action="guide">
+                            📚 How to use it
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            setupButtonListeners();
+            document.getElementById('visibleBots').textContent = bots.length;
+        }
+
+        // Function to setup button event listeners
+        function setupButtonListeners() {
+            const buttons = document.querySelectorAll('.action-btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const botName = this.getAttribute('data-bot-name');
+                    const botUrl = this.getAttribute('data-bot-url');
+                    const action = this.getAttribute('data-action');
+                    
+                    if (action === 'chat') {
+                        chatWithBot(botName, botUrl);
+                    } else if (action === 'guide') {
+                        showGuide(botName);
+                    }
+                });
+            });
+        }
+
+        // Function to filter bots
+        function filterBots() {
+            const searchTerm = document.getElementById('searchBox').value.toLowerCase();
+            let filteredBots = botsData;
+
+            if (currentFilter !== 'all') {
+                filteredBots = filteredBots.filter(bot => bot['Bot Type'] === currentFilter);
+            }
+
+            if (searchTerm) {
+                filteredBots = filteredBots.filter(bot => 
+                    bot.BOTNAME.toLowerCase().includes(searchTerm) || 
+                    bot.Description.toLowerCase().includes(searchTerm) ||
+                    bot['Bot Type'].toLowerCase().includes(searchTerm)
+                );
+            }
+
+            renderBots(filteredBots);
+        }
+
+        // Function to set up category filters
+        function setupFilters() {
+            const categories = [...new Set(botsData.map(bot => bot['Bot Type']))];
+            const filterButtons = document.getElementById('filterButtons');
+            
+            filterButtons.innerHTML = `
+                <button class="filter-btn active" data-category="all">ทั้งหมด</button>
+                ${categories.map(category => 
+                    `<button class="filter-btn" data-category="${category}">${category}</button>`
+                ).join('')}
+            `;
+
+            document.getElementById('activeCategories').textContent = categories.length;
+
+            filterButtons.addEventListener('click', (e) => {
+                if (e.target.classList.contains('filter-btn')) {
+                    filterButtons.querySelectorAll('.filter-btn').forEach(btn => 
+                        btn.classList.remove('active')
+                    );
+                    
+                    e.target.classList.add('active');
+                    currentFilter = e.target.dataset.category;
+                    filterBots();
+                }
+            });
+        }
+
+        // Function to handle chat with bot
+        function chatWithBot(botName, botUrl) {
+            const chatUrl = getChatUrl(botName, botUrl);
+            window.open(chatUrl, '_blank');
+        }
+
+        // Function to show guide/details modal
+        function showGuide(botName) {
+            const bot = botsData.find(b => b.BOTNAME === botName);
+            if (!bot) return;
+
+            document.getElementById('modalBotAvatar').innerHTML = getModalBotAvatar(bot.BOTNAME, bot.Picture);
+            document.getElementById('modalBotName').textContent = bot.BOTNAME;
+            document.getElementById('modalBotType').textContent = bot['Bot Type'];
+            document.getElementById('modalBotDescription').textContent = bot.Description;
+            
+            document.getElementById('modalChatBtn').href = getChatUrl(bot.BOTNAME, bot.GPT);
+            
+            const features = getBotFeatures(bot['Bot Type']);
+            document.getElementById('modalBotFeatures').innerHTML = features.map(feature => 
+                `<div class="feature-item">${feature}</div>`
+            ).join('');
+            
+            document.getElementById('modalBotExample').textContent = getUsageExample(
+                bot.BOTNAME, 
+                bot['Bot Type'], 
+                bot.Description
+            );
+            
+            document.getElementById('botModal').style.display = 'block';
+        }
+
+        // Function to close modal
+        function closeModal() {
+            document.getElementById('botModal').style.display = 'none';
+        }
+
+        // Modal event listeners
+        function setupModalListeners() {
+            document.getElementById('closeModal').onclick = closeModal;
+            
+            window.onclick = function(event) {
+                const modal = document.getElementById('botModal');
+                if (event.target == modal) {
+                    closeModal();
+                }
+            }
+            
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    closeModal();
+                }
+            });
+        }
+
+        // Initialize the app
+        function initApp() {
+            try {
+                botsData = getAllBotsData();
+                console.log('Loaded', botsData.length, 'bots');
+
+                setupFilters();
+                renderBots(botsData);
+                setupModalListeners();
+
+                document.getElementById('searchBox').addEventListener('input', filterBots);
+                document.getElementById('totalBots').textContent = botsData.length;
+
+            } catch (error) {
+                console.error('Error initializing app:', error);
+                document.getElementById('botsGrid').innerHTML = '<div style="text-align: center; color: white; font-size: 1.2rem;">เกิดข้อผิดพลาดในการโหลดข้อมูล</div>';
+            }
+        }
+
+        // Start the app when page loads
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
